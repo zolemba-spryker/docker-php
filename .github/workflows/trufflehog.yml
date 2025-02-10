@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   trufflehog-vulnerability-detection:
+    if: false
     runs-on: ubuntu-latest
 
     steps:

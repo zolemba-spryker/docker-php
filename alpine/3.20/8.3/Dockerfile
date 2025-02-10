@@ -68,6 +68,7 @@ ARG PHP_PECL_EXTENSIONS="\
     redis"
 
 ARG ADDITIONAL_PHP_PECL_EXTENSIONS="\
+    excimer \
     pcov \
     xdebug \
     xhprof \
@@ -102,7 +103,7 @@ RUN apk update \
     && rm -rf /var/lib/apt/lists/ \
     && cd /tmp && curl -LO https://github.com/unicode-org/icu/releases/download/release-74-1/icu4c-74_1-src.tgz \
     && tar xzf icu4c-74_1-src.tgz \
-    && cd icu/source && ./configure --prefix=/usr && make && make install \
+    && cd icu/source && ./configure --prefix=/usr && make -j5 && make install \
     && docker-php-ext-configure gd \
       --disable-gd-jis-conv \
       --with-freetype=/usr \
@@ -110,7 +111,7 @@ RUN apk update \
       --with-webp=/usr \
       --with-xpm=/usr \
     && docker-php-ext-install -j5 ${PHP_EXTENSIONS} \
-    && pecl install -o -f ${PHP_PECL_EXTENSIONS} ${ADDITIONAL_PHP_PECL_EXTENSIONS} \
+    && MAKEFLAGS="-j$(nproc)" pecl install -o -f ${PHP_PECL_EXTENSIONS} ${ADDITIONAL_PHP_PECL_EXTENSIONS} \
     && rm -rf /tmp/pear \
     && docker-php-ext-enable ${PHP_EXTENSIONS} ${PHP_PECL_EXTENSIONS} \
     && apk del --no-cache .php-build-deps
